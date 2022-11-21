@@ -17,10 +17,12 @@ export async function getAllTicketsTypes(req: AuthenticatedRequest, res: Respons
 export async function getAllTickets(req: AuthenticatedRequest, res: Response) {
   try {
     const tickets = await ticketsService.getAllTickets();
-    if (!tickets) return res.sendStatus(httpStatus.NOT_FOUND);
 
     return res.status(httpStatus.OK).send(tickets);
   } catch (error) {
+    if (error.name === "NotFoundError") {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
     return res.sendStatus(httpStatus.NO_CONTENT);
   }
 }
@@ -31,13 +33,12 @@ export async function createNewTicket(req: AuthenticatedRequest, res: Response) 
   if (!ticketTypeId) return res.sendStatus(httpStatus.BAD_REQUEST);
   try {
     const enrollment = await enrollmentsService.getOneWithAddressByUserId(userId);
-    // if (!enrollment) return res.sendStatus(httpStatus.NOT_FOUND);
     await ticketsService.createNewTicket(ticketTypeId, enrollment.id);
     const tickets = await ticketsService.getUniqueTicket(Number(ticketTypeId));
 
     return res.status(httpStatus.CREATED).send(tickets);
   } catch (error) {
-    if (error.message === "No result for this search!") {
+    if (error.name === "NotFoundError") {
       return res.sendStatus(httpStatus.NOT_FOUND);
     }
     return res.sendStatus(httpStatus.NO_CONTENT);

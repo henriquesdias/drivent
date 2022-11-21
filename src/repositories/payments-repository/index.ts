@@ -1,5 +1,4 @@
 import { prisma } from "@/config";
-import { Prisma } from "@prisma/client";
 
 async function findUnique(id: number) {
   return prisma.payment.findFirst({
@@ -22,10 +21,27 @@ async function findUnique(id: number) {
 async function findMany() {
   return prisma.payment.findMany();
 }
+async function create({ ticketId, value, cardIssuer, cardLastDigits }: Payment) {
+  return prisma.payment.create({
+    data: {
+      ticketId,
+      value,
+      cardIssuer,
+      cardLastDigits,
+    },
+  });
+}
+type Payment = {
+  ticketId: number;
+  value: number;
+  cardIssuer: string;
+  cardLastDigits: string;
+};
 
 const paymentsRepository = {
   findUnique,
   findMany,
+  create,
 };
 
 export default paymentsRepository;
