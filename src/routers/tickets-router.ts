@@ -4,8 +4,10 @@ import { getAllTicketsTypes, getAllTickets, createNewTicket } from "@/controller
 
 const ticketsRouter = Router();
 
-ticketsRouter.get("/types", authenticateToken, getAllTicketsTypes);
-ticketsRouter.get("/", authenticateToken, getAllTickets);
-ticketsRouter.post("/", authenticateToken, createNewTicket);
+ticketsRouter
+  .all("/*", authenticateToken)
+  .get("/types", getAllTicketsTypes)
+  .get("/", getAllTickets)
+  .post("/", createNewTicket);
 
 export { ticketsRouter };
