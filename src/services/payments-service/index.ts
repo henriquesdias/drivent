@@ -1,9 +1,15 @@
 import paymentsRepository from "@/repositories/payments-repository";
-import { notFoundError } from "@/errors";
+import ticketsRepository from "@/repositories/tickets-repository";
+import { notFoundError, unauthorizedError } from "@/errors";
 
-async function getUniquePayment(id: number) {
+async function getUniquePayment(id: number, userId: number) {
+  const ticket = await ticketsRepository.findFirstTicket(id);
+  if (!ticket) throw notFoundError();
+  if (ticket.Enrollment.userId !== userId) {
+    throw unauthorizedError();
+  }
   const payment = await paymentsRepository.findUnique(id);
-  if (!payment) throw notFoundError();
+
   return payment;
 }
 async function getAllPayments() {

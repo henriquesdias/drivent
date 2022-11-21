@@ -9,12 +9,23 @@ export async function getPayment(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   if (!ticketId) return res.sendStatus(httpStatus.BAD_REQUEST);
   try {
-    const payment = await paymentsService.getUniquePayment(Number(ticketId));
+    const payment = await paymentsService.getUniquePayment(Number(ticketId), userId);
 
-    return res.status(httpStatus.OK).send({ id: payment.id, ticketId: payment.ticketId });
+    return res.status(httpStatus.OK).send({
+      id: payment.id,
+      ticketId: payment.ticketId,
+      value: payment.value,
+      cardIssuer: payment.cardIssuer,
+      cardLastDigits: payment.cardLastDigits,
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt,
+    });
   } catch (error) {
     if (error.name === "NotFoundError") {
       return res.send(httpStatus.NOT_FOUND);
+    }
+    if (error.name === "UnauthorizedError") {
+      return res.sendStatus(httpStatus.UNAUTHORIZED);
     }
   }
 }

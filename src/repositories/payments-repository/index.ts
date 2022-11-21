@@ -3,18 +3,7 @@ import { prisma } from "@/config";
 async function findUnique(id: number) {
   return prisma.payment.findFirst({
     where: {
-      id,
-    },
-    include: {
-      Ticket: {
-        include: {
-          Enrollment: {
-            select: {
-              userId: true,
-            },
-          },
-        },
-      },
+      ticketId: id,
     },
   });
 }
